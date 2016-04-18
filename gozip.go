@@ -1,17 +1,17 @@
 package main
 
 import (
-	"os"
-	"io"
-	"log"
-	"io/ioutil"
 	"bytes"
 	"github.com/alexmullins/zip"
+	"io"
+	"io/ioutil"
+	"log"
+	"os"
 )
 
 var zipFile string
-var files  []string
-var passwd  string
+var files []string
+var passwd string
 
 func main() {
 	log.Printf("os.Args: '%v'\n", os.Args)
@@ -28,16 +28,17 @@ func main() {
 		passwd = "infected"
 	}
 	files = os.Args[3:]
-	if len(files)  < 1 {
+	if len(files) < 1 {
 		log.Fatal("No files to archive given, third and following arguments must be filenames to be zipped/archived.")
 	}
 	// write a password zip
 	raw := new(bytes.Buffer)
 	zipw := zip.NewWriter(raw)
 	for _, f := range files {
+		log.Printf("go to archive file '%s'...\n", f)
 		contents, err := ioutil.ReadFile(f)
 		if err != nil {
-			log.Printf("Could not read file '%s'. Error: %s\n", f, err.Error)
+			log.Printf("Could not read file '%s'. Error: %v\n", f, err.Error)
 			continue
 		}
 		w, err := zipw.Encrypt(f, passwd)
@@ -50,8 +51,9 @@ func main() {
 		}
 	}
 	zipw.Close()
-	err := ioutil .WriteFile(zipFile, raw.Bytes(), 0644)
+	err := ioutil.WriteFile(zipFile, raw.Bytes(), 0644)
 	if err != nil {
-		log.Fatal("Could not write zipFile '%s'. Erorr: %s\n", zipFile, err.Error)
+		log.Printf("Could not write zipFile '%s'. Erorr: %s\n", zipFile, err.Error())
+		log.Fatal(err)
 	}
 }
