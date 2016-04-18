@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/alexmullins/zip"    // hacked zip lib, supports AES encrypted archives
+	"flag"
+	"github.com/alexmullins/zip" // hacked zip lib, supports AES encrypted archives
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
-    "flag"
 )
 
 var zipFile string
@@ -17,17 +17,16 @@ var needBaseDir bool
 func init() {
 	flag.StringVar(&zipFile, "f", "", "zip file to create")
 	flag.StringVar(&passwd, "p", "infected", "password to use")
-    flag.StringVar(&target, "d", "./", "file/dir to add to zip")
-    flag.BoolVar(&needBaseDir, "includeBaseDir", true, "per default includes the dir structure")
+	flag.StringVar(&target, "d", "./", "file/dir to add to zip")
+	flag.BoolVar(&needBaseDir, "includeBaseDir", true, "per default includes the dir structure")
 }
 
 func main() {
-    flag.Parse()
-    //err := zipit(target, zipFile, false)
-    err := zipit(target, zipFile, needBaseDir)
-    if err != nil {
-        panic(err)
-    }
+	flag.Parse()
+	err := zipit(target, zipFile, needBaseDir)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func zipit(source, target string, needBaseDir bool) error {
@@ -39,7 +38,6 @@ func zipit(source, target string, needBaseDir bool) error {
 
 	archive := zip.NewWriter(zipfile)
 	defer archive.Close()
-    //archive.SetPassword(passwd)
 
 	info, err := os.Stat(source)
 	if err != nil {
@@ -81,7 +79,7 @@ func zipit(source, target string, needBaseDir bool) error {
 		} else {
 			header.Method = zip.Deflate
 		}
-        header.SetPassword(passwd)
+		header.SetPassword(passwd)
 		writer, err := archive.CreateHeader(header)
 
 		if info.IsDir() {
