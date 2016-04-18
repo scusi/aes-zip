@@ -2,12 +2,12 @@ package main
 
 import (
 	//"archive/zip"                 // default zip lib
-	"github.com/alexmullins/zip"    // hacked zip lib, supports AES encrypted archives
+	"github.com/alexmullins/zip" // hacked zip lib, supports AES encrypted archives
 	"io"
 	"os"
 	"path/filepath"
 	//"strings"
-    "flag"
+	"flag"
 )
 
 var zipFile string
@@ -17,15 +17,15 @@ var target string
 func init() {
 	flag.StringVar(&zipFile, "f", "", "zip file to unpack")
 	flag.StringVar(&passwd, "p", "infected", "password to use")
-    flag.StringVar(&target, "d", "./", "target dir to write output to")
+	flag.StringVar(&target, "d", "./", "target dir to write output to")
 }
 
 func main() {
-    flag.Parse()
-    err := unzip(zipFile, target)
-    if err != nil {
-        panic(err)
-    }
+	flag.Parse()
+	err := unzip(zipFile, target)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func unzip(archive, target string) error {
@@ -44,9 +44,9 @@ func unzip(archive, target string) error {
 		if file.FileInfo().IsDir() {
 			os.MkdirAll(path, file.Mode())
 			continue
-            //break
+			//break
 		}
-        file.SetPassword(passwd)
+		file.SetPassword(passwd)
 		fileReader, err := file.Open()
 		if err != nil {
 			return err
