@@ -4,13 +4,13 @@ package main
 // maybe take a closer look at: https://gist.github.com/yhirose/addb8d248825d373095c
 
 import (
+	"bytes"
+	"flag"
+	"github.com/alexmullins/zip"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
-	"bytes"
-	"log"
-	"github.com/alexmullins/zip"
-	"flag"
-	"io/ioutil"
 )
 
 var zipFile string
@@ -56,7 +56,7 @@ func main() {
 		}
 		err = ioutil.WriteFile(z.Name, contents, 0644)
 		/*
-		_, err = io.Copy(os.Stdout, rr)
+			_, err = io.Copy(os.Stdout, rr)
 		*/
 		if err != nil {
 			log.Fatal(err)
