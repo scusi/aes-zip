@@ -1,19 +1,22 @@
+// malware extract - extracts zip files encrypted with the password 'infected',
+// which is basically industry standard in the anti-malware industry.
+//
 package main
 
 import (
-	//"archive/zip"                 // default zip lib
 	"github.com/alexmullins/zip"    // hacked zip lib, supports AES encrypted archives
 	"io"
 	"os"
 	"path/filepath"
-	//"strings"
     "flag"
 )
 
+// define local variables
 var zipFile string
 var passwd string
 var target string
 
+// initialize variables
 func init() {
 	flag.StringVar(&zipFile, "f", "", "zip file to unpack")
 	flag.StringVar(&passwd, "p", "infected", "password to use")
@@ -28,6 +31,7 @@ func main() {
     }
 }
 
+// unzip and decrypt the archive
 func unzip(archive, target string) error {
 	reader, err := zip.OpenReader(archive)
 	if err != nil {
@@ -44,7 +48,6 @@ func unzip(archive, target string) error {
 		if file.FileInfo().IsDir() {
 			os.MkdirAll(path, file.Mode())
 			continue
-            //break
 		}
         file.SetPassword(passwd)
 		fileReader, err := file.Open()
@@ -63,6 +66,5 @@ func unzip(archive, target string) error {
 			return err
 		}
 	}
-
 	return nil
 }
