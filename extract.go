@@ -20,15 +20,15 @@ var target string
 func init() {
 	flag.StringVar(&zipFile, "f", "", "zip file to unpack")
 	flag.StringVar(&passwd, "p", "infected", "password to use")
-    flag.StringVar(&target, "d", "./", "target dir to write output to")
+	flag.StringVar(&target, "d", "./", "target dir to write output to")
 }
 
 func main() {
-    flag.Parse()
-    err := unzip(zipFile, target)
-    if err != nil {
-        panic(err)
-    }
+	flag.Parse()
+	err := unzip(zipFile, target)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // unzip and decrypt the archive
@@ -49,7 +49,7 @@ func unzip(archive, target string) error {
 			os.MkdirAll(path, file.Mode())
 			continue
 		}
-        file.SetPassword(passwd)
+		file.SetPassword(passwd)
 		fileReader, err := file.Open()
 		if err != nil {
 			return err
