@@ -1,5 +1,18 @@
-// malware extract - extracts zip files encrypted with the password 'infected',
+// mwextract - malware extract - extracts zip files encrypted with the password 'infected',
 // which is basically industry standard in the anti-malware industry.
+// mwextract does also unpack normal zip archives that are not protected by a password.
+//
+// mwextract does show checksums of files extracted
+//
+// Author: Florian 'scusi' Walther <flw@posteo.de>
+//
+// Usage:
+//
+// unpack archive 'archive.zip', use password 'infected815'
+// mwextract -f archive.zip -p infected0815
+//
+// unpack archies '1.zip', '2.zip' and '3.zip'
+// mwextract 1.zip 2.zip 3.zip
 //
 package main
 
@@ -12,43 +25,61 @@ import (
 	"github.com/scusi/MultiChecksum"
 	"github.com/scusi/magic"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 )
 
 // define local variables
-var zipFile string
-var passwd string
-var target string
+var zipFile string // zipFile to unpack
+var passwd string  // password to be used for decryption of zipFile
+var target string  // file/path where to write output to
+var verbose bool   // be verbose or not
 
-// initialize variables
+// init - initialize variables, set defaults
 func init() {
 	flag.StringVar(&zipFile, "f", "", "zip file to unpack")
 	flag.StringVar(&passwd, "p", "infected", "password to use")
 	flag.StringVar(&target, "d", "./", "target dir to write output to")
+	flag.BoolVar(&verbose, "v", false, "be verbose if true")
 }
 
+// main - main program loop
 func main() {
 	flag.Parse()
+	if verbose == true {
+		log.Printf("verbose == %t\n", verbose)
+	}
+	// if zipFile variale is empty
 	if zipFile == "" {
+		// range over arguments
 		for _, zipFile = range os.Args[1:] {
-			log.Printf("zipFile is: %s\n", zipFile)
+			if verbose == true {
+				log.Printf("zipFile is: %s\n", zipFile)
+			}
+			// check if file has a signature that we can handle
 			ok, typ, err := checkType(zipFile)
 			if err != nil {
 				panic(err)
 			}
-			log.Printf("file OK? : %t\n", ok)
+			if verbose == true {
+				log.Printf("file OK? : %t\n", ok)
+			}
+			// unzip and decrypt if it is AES encrypted
 			if ok == true && typ == "aes" {
-				log.Printf("zipFile is of correct version\n")
+				if verbose == true {
+					log.Printf("zipFile is of correct version\n")
+				}
 				err := aesUnzip(zipFile, target)
 				if err != nil {
 					panic(err)
 				}
 			}
+			// just unzip if it is a plain zip archive
 			if ok == true && typ == "plain" {
-				log.Printf("unzip as non AES zip archive\n")
+				if verbose == true {
+					log.Printf("unzip as non AES zip archive\n")
+				}
 				err := unzip(zipFile, target)
 				if err != nil {
 					panic(err)
@@ -56,21 +87,32 @@ func main() {
 			}
 		}
 	} else {
-		log.Printf("zipFile is: %s\n", zipFile)
+		// operate on given zipFile
+		if verbose == true {
+			log.Printf("zipFile is: %s\n", zipFile)
+		}
 		ok, typ, err := checkType(zipFile)
 		if err != nil {
 			panic(err)
 		}
-		log.Printf("file OK? : %t\n", ok)
-		if ok {
-			log.Printf("zipFile is of correct version\n")
+		if verbose == true {
+			log.Printf("file OK? : %t\n", ok)
+		}
+		// unzip and decrypt if it is AES encrypted
+		if ok == true && typ == "aes" {
+			if verbose == true {
+				log.Printf("zipFile is of correct version\n")
+			}
 			err := aesUnzip(zipFile, target)
 			if err != nil {
 				panic(err)
 			}
 		}
+		// just unzip if it is a plain zip archive
 		if ok == true && typ == "plain" {
-			log.Printf("unzip as non AES zip archive\n")
+			if verbose == true {
+				log.Printf("unzip as non AES zip archive\n")
+			}
 			err := unzip(zipFile, target)
 			if err != nil {
 				panic(err)
@@ -79,7 +121,7 @@ func main() {
 	}
 }
 
-// check if it a zip file with the right version...
+// checkType - checks if given file is a zip file we can handle
 func checkType(fileName string) (ok bool, typ string, err error) {
 	ok = false
 	reader, err := os.Open(fileName)
@@ -89,28 +131,38 @@ func checkType(fileName string) (ok bool, typ string, err error) {
 	mime, _ := magic.MIMETypeFromReader(reader)
 	if mime == "Zip Archive Version 5.1, AES Encrypted" {
 		typ = "aes"
-		log.Printf("mime type is correct: '%s'\n", mime)
+		if verbose == true {
+			log.Printf("mime type is correct: '%s'\n", mime)
+		}
 		return true, typ, nil
 	}
 
 	if mime == "Zip Archive Version 5.1, AES Encrypted, UTF-8" {
 		typ = "aes"
-		log.Printf("mime type is correct: '%s'\n", mime)
+		if verbose == true {
+			log.Printf("mime type is correct: '%s'\n", mime)
+		}
 		return true, typ, nil
 	}
 	if mime == "Zip Archive" {
 		typ = "plain"
-		log.Printf("mime type is correct: '%s'\n", mime)
+		if verbose == true {
+			log.Printf("mime type is correct: '%s'\n", mime)
+		}
 		return true, typ, nil
 	} else {
-		log.Printf("MIME NOT OK, MIMEType was: %s\n", mime)
+		if verbose == true {
+			log.Printf("MIME NOT OK, MIMEType was: %s\n", mime)
+		}
 		return ok, typ, nil
 	}
 }
 
-// unzip and decrypt the archive
+// aesUnzip - unzip and decrypt the archive
 func aesUnzip(archive, target string) error {
-	log.Printf("going to read archive: %s\n", archive)
+	if verbose == true {
+		log.Printf("going to read archive: %s\n", archive)
+	}
 	reader, err := aesZip.OpenReader(archive)
 	if err != nil {
 		return err
@@ -141,25 +193,27 @@ func aesUnzip(archive, target string) error {
 			return err
 		}
 		defer targetFile.Close()
-
-		l, err := io.Copy(targetFile, fileReader)
+		// use a T-reader
+		var buf bytes.Buffer
+		teeReader := io.TeeReader(fileReader, &buf)
+		// copy unziped data to target file
+		l, err := io.Copy(targetFile, teeReader)
 		if err != nil {
 			return err
 		}
-		fileData, err := ioutil.ReadAll(fileReader)
-		if err != nil {
-			return err
-		}
-		chksums := multichecksum.CalcChecksums(path, fileData)
+		// calculate checksums for each file written
+		chksums := multichecksum.CalcChecksums(path, buf.Bytes())
 		fmt.Println("")
-		fmt.Printf("Filename: '%s', Size: '%d'\n%s", path, l, chksums.Filter("MD5", "SHA1", "SHA2", "Blake2b2"))
+		fmt.Printf("Filename: '%s', Size: '%d'\n%s", path, l, chksums.Filter("MD5", "SHA1", "SHA2", "Blake2b"))
 	}
 	return nil
 }
 
-// unzip the archive
+// unzip - just use normal unzip procedure (without any encryption)
 func unzip(archive, target string) error {
-	log.Printf("going to read archive: %s\n", archive)
+	if verbose == true {
+		log.Printf("going to read archive: %s\n", archive)
+	}
 	reader, err := zip.OpenReader(archive)
 	if err != nil {
 		return err
@@ -191,18 +245,19 @@ func unzip(archive, target string) error {
 		}
 		defer targetFile.Close()
 
-		// T-reader
+		// use a T-reader
 		var buf bytes.Buffer
 		teeReader := io.TeeReader(fileReader, &buf)
-
+		// copy unziped data to target file
 		l, err := io.Copy(targetFile, teeReader)
 		if err != nil {
 			return err
 		}
+		// calculate checksums for each file written
 		chksums := multichecksum.CalcChecksums(path, buf.Bytes())
 		fmt.Println("")
 		//fmt.Printf("Filename: '%s', Size: '%d'\n%s", path, l, chksums.String())
-		fmt.Printf("Filename: '%s', Size: '%d'\n%s", path, l, chksums.Filter("MD5", "SHA1", "SHA2", "Blake2b2"))
+		fmt.Printf("Filename: '%s', Size: '%d'\n%s", path, l, chksums.Filter("MD5", "SHA1", "SHA2", "Blake2b"))
 	}
 	return nil
 }
