@@ -7,24 +7,12 @@
 
 ### gozip
 
-#### build
-
-```
-go build ./cmd/gozip
-```
-
 #### Syntax
 ```
 gozip <ARCHIVE.ZIP> <PASSWORD> <File(s)>...
 ```
 
 ### gounzip
-
-#### build
-
-```
-go build ./cmd/gounzip
-```
 
 #### Syntax
 
@@ -61,4 +49,20 @@ The industry standard password (`infected`) is used if no other password is set.
 mwextract <ARCHIVE.ZIP>...
 ```
 
+### build 
+
+```
+fwa@fwa01lt:~/go/src/github.com/scusi/AesZip$ docker run -ti --rm -v `pwd`:/usr/src/aeszip -w /usr/src/aeszip golang:1.15 bash
+root@7828a19dc519:/usr/src/aeszip# go build ./cmd/mwcompress/
+go: downloading github.com/alexmullins/zip v0.0.0-20180717182244-4affb64b04d0
+go: downloading golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+root@7828a19dc519:/usr/src/aeszip# go build ./cmd/mwextract/ 
+go: downloading github.com/scusi/MultiChecksum v0.1.0
+go: downloading github.com/dchest/blake2b v1.0.0
+go: downloading github.com/dchest/blake2s v1.0.0
+root@7828a19dc519:/usr/src/aeszip# go build ./cmd/gounzip/  
+root@7828a19dc519:/usr/src/aeszip# go build ./cmd/gozip/  
+root@7828a19dc519:/usr/src/aeszip# exit
+fwa@fwa01lt:~/go/src/github.com/scusi/AesZip$ 
+```
 
