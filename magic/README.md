@@ -1,4 +1,4 @@
-This magic module comes from [camlistore.org/pkg/magic](https://camlistore.org/pkg/magic) and was extended to recognize different types of zip archives and other file types that are important for DFIR work.
+This magic module comes from [camlistore.org/pkg/magic](https://camlistore.org/pkg/magic) and was extended to recognize different types of zip archives and other file types that are important for my work.
 
 ```
 {[]byte{0x4D, 0x5A}, "MZ Header found - Windows/DOS executable file"},
