@@ -23,7 +23,7 @@ import (
 	"fmt"
 	aesZip "github.com/alexmullins/zip" // hacked zip lib, supports AES encrypted archives
 	"github.com/scusi/MultiChecksum"
-	"github.com/scusi/magic"
+	"gitlab.scusi.io/flow/aeszip/magic"
 	"io"
 	"log"
 	"os"
