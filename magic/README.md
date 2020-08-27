@@ -1,4 +1,4 @@
-This magic module comes from [camlistore.org/pkg/magic](https://camlistore.org/pkg/magic) and was extended to recognize different types of zip archives.
+This magic module comes from [camlistore.org/pkg/magic](https://godoc.org/camlistore.org/pkg/magic) and was extended to recognize different types of zip archives.
 
 ```
 {[]byte{0x50, 0x4B, 0x03, 0x04, 0x33, 0x00, 0x01, 0x00, 0x63, 0x00}, "Zip Archive Version 5.1, AES Encrypted"},
