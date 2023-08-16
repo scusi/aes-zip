@@ -35,6 +35,7 @@ var zipFile string // zipFile to unpack
 var passwd string  // password to be used for decryption of zipFile
 var target string  // file/path where to write output to
 var verbose bool   // be verbose or not
+var force bool		// force AES unzip
 
 // init - initialize variables, set defaults
 func init() {
@@ -42,6 +43,7 @@ func init() {
 	flag.StringVar(&passwd, "p", "infected", "password to use")
 	flag.StringVar(&target, "d", "./", "target dir to write output to")
 	flag.BoolVar(&verbose, "v", false, "be verbose if true")
+	flag.BoolVar(&force, "force", true, "tries to AES decrypt anyway")
 }
 
 // main - main program loop
@@ -64,6 +66,10 @@ func main() {
 			}
 			if verbose == true {
 				log.Printf("file OK? : %t\n", ok)
+			}
+			if force == true {
+				ok = true
+				typ = "aes"
 			}
 			// unzip and decrypt if it is AES encrypted
 			if ok == true && typ == "aes" {
@@ -97,6 +103,10 @@ func main() {
 		}
 		if verbose == true {
 			log.Printf("file OK? : %t\n", ok)
+		}
+		if force == true {
+			ok = true
+			typ = "aes"
 		}
 		// unzip and decrypt if it is AES encrypted
 		if ok == true && typ == "aes" {
